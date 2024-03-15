@@ -1,51 +1,63 @@
 import streamlit as st
 import pandas as pd
-import base64
+import matplotlib.pyplot as plt
 
-# Function to read and display CSV
-def read_csv(file):
-    df = pd.read_csv(file)
+# Function to read and manipulate data
+def manipulate_data(file):
+    df = pd.read_csv(file, skiprows=1)  # Skip the first row as it contains column headers
+    df = df.dropna(subset=['Unit'])  # Drop rows where Unit is NaN
+    df = df.drop(columns=['Sqft', 'Recurring Charges', 'Annual Rent / SF', 'Deposit'])  # Remove unnecessary columns
+    df['Lease Start Date'] = pd.to_datetime(df['Lease From'], errors='coerce')  # Convert Lease From to datetime
+    df['Lease End Date'] = pd.to_datetime(df['Lease To'], errors='coerce')  # Convert Lease To to datetime
+    df['Property % SF'] = df['Square Feet'] / df['Square Feet'].sum() * 100  # Calculate Property % SF
     return df
 
-# Function for data manipulation
-def manipulate_data(df):
-    # Add your data manipulation code here
-    # For now, let's just return the original DataFrame
-    return df
+# Function for predictive visualizations
+def predictive_visualizations(df):
+    # Histogram of Lease Duration
+    st.subheader("Histogram of Lease Duration")
+    plt.hist(df['Lease End Date'] - df['Lease Start Date'], bins=10, color='skyblue', edgecolor='black')
+    plt.xlabel('Lease Duration')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Lease Duration')
+    st.pyplot()
 
-# Function to download CSV
-def download_csv(df):
-    csv_file = df.to_csv(index=False)
-    b64 = base64.b64encode(csv_file.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="data.csv">Download CSV File</a>'
-    st.markdown(href, unsafe_allow_html=True)
+# Function for business insights
+def business_insights(df):
+    st.subheader("Business Insights")
+    # Example 1: Average Rent per Square Foot
+    avg_rent_per_sf = df['Rent'].sum() / df['Square Feet'].sum()
+    st.write(f"The average rent per square foot is ${avg_rent_per_sf:.2f}.")
+
+    # Example 2: Occupancy Rate
+    occupancy_rate = len(df[df['Lease End Date'] > pd.Timestamp.now()]) / len(df) * 100
+    st.write(f"The occupancy rate is {occupancy_rate:.2f}%.")
+
+    # Example 3: Top Tenants by Rent
+    st.write("Top Tenants by Rent:")
+    top_tenants = df.groupby('Tenant')['Rent'].sum().nlargest(10)
+    st.write(top_tenants)
 
 # Main function
 def main():
-    st.title("Hait's CSV File Uploader, Manipulator, and Downloader")
+    st.title('Real Estate Data Manipulation')
 
     # File uploader
     file = st.file_uploader("Upload a CSV file", type=["csv"])
 
     if file is not None:
         st.success("File successfully uploaded!")
-        df = read_csv(file)
+        df = manipulate_data(file)
 
-        # Option to display the imported data
-        if st.checkbox("Display the imported data"):
-            st.write("Imported data:")
-            st.write(df)
+        # Display manipulated data
+        st.write("Manipulated data:")
+        st.write(df)
 
-        # Option to manipulate the data
-        if st.checkbox("Manipulate the data"):
-            df = manipulate_data(df)
-            if st.checkbox("Display the manipulated data"):
-                st.write("Data after manipulation:")
-                st.write(df)
+        # Predictive visualizations
+        predictive_visualizations(df)
 
-        # Option to download the file
-        if st.button("Download"):
-            download_csv(df)
+        # Business insights
+        business_insights(df)
 
 if __name__ == "__main__":
     main()
