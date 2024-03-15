@@ -2,16 +2,12 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-# Function to read and manipulate data
 # Function to read and manipulate data
 def manipulate_data(file):
     if file.name.endswith('.csv'):
         df = pd.read_csv(file, skiprows=1)  # Skip the first row as it contains column headers
-    elif file.name.endswith('.xlsx'):
-        df = pd.read_excel(file, skiprows=1)  # Skip the first row as it contains column headers
     else:
-        st.error("Unsupported file format. Please upload a CSV or Excel file.")
+        st.error("Unsupported file format. Please upload a CSV file.")
         return None
 
     # Check if 'Unit' column exists in the DataFrame
@@ -34,7 +30,6 @@ def manipulate_data(file):
 
     return df
 
-
 # Function for predictive visualizations
 def predictive_visualizations(df):
     # Histogram of Lease Duration
@@ -44,7 +39,6 @@ def predictive_visualizations(df):
     plt.ylabel('Frequency')
     plt.title('Distribution of Lease Duration')
     st.pyplot()
-
 
 # Function for business insights
 def business_insights(df):
@@ -62,13 +56,12 @@ def business_insights(df):
     top_tenants = df.groupby('Tenant')['Rent'].sum().nlargest(10)
     st.write(top_tenants)
 
-
 # Main function
 def main():
     st.title('Real Estate Data Manipulation')
 
     # File uploader
-    file = st.file_uploader("Upload a file", type=["csv", "xlsx"])
+    file = st.file_uploader("Upload a file", type=["csv"])
 
     if file is not None:
         st.success("File successfully uploaded!")
@@ -84,7 +77,6 @@ def main():
 
             # Business insights
             business_insights(df)
-
 
 if __name__ == "__main__":
     main()
