@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 
 # Function to read and manipulate data
+# Function to read and manipulate data
 def manipulate_data(file):
     if file.name.endswith('.csv'):
         df = pd.read_csv(file, skiprows=1)  # Skip the first row as it contains column headers
@@ -13,11 +14,24 @@ def manipulate_data(file):
         st.error("Unsupported file format. Please upload a CSV or Excel file.")
         return None
 
-    df = df.dropna(subset=['Unit'])  # Drop rows where Unit is NaN
-    df = df.drop(columns=['Sqft', 'Recurring Charges', 'Annual Rent / SF', 'Deposit'])  # Remove unnecessary columns
-    df['Lease Start Date'] = pd.to_datetime(df['Lease From'], errors='coerce')  # Convert Lease From to datetime
-    df['Lease End Date'] = pd.to_datetime(df['Lease To'], errors='coerce')  # Convert Lease to datetime
-    df['Property % SF'] = df['Square Feet'] / df['Square Feet'].sum() * 100  # Calculate Property % SF
+    # Check if 'Unit' column exists in the DataFrame
+    if 'Unit' not in df.columns:
+        st.error("Column 'Unit' not found in the uploaded file.")
+        return None
+
+    # Drop rows where 'Unit' is NaN
+    df = df.dropna(subset=['Unit'])
+
+    # Remove unnecessary columns
+    df = df.drop(columns=['Sqft', 'Recurring Charges', 'Annual Rent / SF', 'Deposit'])
+
+    # Convert 'Lease From' and 'Lease To' to datetime
+    df['Lease Start Date'] = pd.to_datetime(df['Lease From'], errors='coerce')
+    df['Lease End Date'] = pd.to_datetime(df['Lease To'], errors='coerce')
+
+    # Calculate Property % SF
+    df['Property % SF'] = df['Square Feet'] / df['Square Feet'].sum() * 100
+
     return df
 
 
