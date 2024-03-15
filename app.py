@@ -16,7 +16,7 @@ def manipulate_data(file):
     df = df.dropna(subset=['Unit'])  # Drop rows where Unit is NaN
     df = df.drop(columns=['Sqft', 'Recurring Charges', 'Annual Rent / SF', 'Deposit'])  # Remove unnecessary columns
     df['Lease Start Date'] = pd.to_datetime(df['Lease From'], errors='coerce')  # Convert Lease From to datetime
-    df['Lease End Date'] = pd.to_datetime(df['Lease To'], errors='coerce')  # Convert Lease To to datetime
+    df['Lease End Date'] = pd.to_datetime(df['Lease To'], errors='coerce')  # Convert Lease to datetime
     df['Property % SF'] = df['Square Feet'] / df['Square Feet'].sum() * 100  # Calculate Property % SF
     return df
 
