@@ -22,7 +22,7 @@ def download_csv(df):
 
 # Main function
 def main():
-    st.title('CSV File Uploader, Manipulator, and Downloader')
+    st.title("Lior's CSV File Uploader, Manipulator, and Downloader")
 
     # File uploader
     file = st.file_uploader("Upload a CSV file", type=["csv"])
