@@ -6,8 +6,11 @@ import matplotlib.pyplot as plt
 def manipulate_data(file):
     if file.name.endswith('.csv'):
         df = pd.read_csv(file, skiprows=1)  # Skip the first row as it contains column headers
+    elif file.name.endswith('.xlsx'):
+        # Using pandas built-in support for reading XLSX files
+        df = pd.read_excel(file, skiprows=1, engine='openpyxl')  # Skip the first row as it contains column headers
     else:
-        st.error("Unsupported file format. Please upload a CSV file.")
+        st.error("Unsupported file format. Please upload a CSV or Excel file.")
         return None
 
     # Check if 'Unit' column exists in the DataFrame
@@ -61,7 +64,7 @@ def main():
     st.title('Real Estate Data Manipulation')
 
     # File uploader
-    file = st.file_uploader("Upload a file", type=["csv"])
+    file = st.file_uploader("Upload a file", type=["csv", "xlsx"])
 
     if file is not None:
         st.success("File successfully uploaded!")
